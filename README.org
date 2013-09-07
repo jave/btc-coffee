@@ -1,0 +1,26 @@
+* btc-coffee
+Software for a bitcoin operated coffee machine.
+
+You need a bitcoind running.
+Edit the configuration file.
+start btc-coffee.
+
+point a browser to: http://localhost:9198/btc-coffee/qr-wrapper
+Now you can scan the presented QR code, and messages show if the payment has been accepted.
+
+
+** building
+lein uberjar
+
+** running
+bitcoind -d
+java -jar target/btc-coffee-0.1.0-standalone.jar 
+
+
+
+** License
+
+Copyright © 2013 Joakim Verona
+
+Distributed under the Eclipse Public License either version 1.0 or (at
+your option) any later version.
