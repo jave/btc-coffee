@@ -4,7 +4,7 @@
         (compojure [core :only [defroutes GET POST]]
                    [route :only [files]]
                    [handler :only [site]])
-        ;;[clojure.tools.logging :only [info]]        
+        [clojure.tools.logging :only [info]]        
         ring.middleware.json
         pawnshop.core
         org.httpkit.server
@@ -39,15 +39,6 @@
 (defn get-config [key]
   (get config key))
 
-;; (defn qr-encode-to-file
-;;   "qr encode and stuf"
-;;   [uri filename & {:keys [size] :or {size 1000}}]
-
-;;   (com.google.zxing.client.j2se.MatrixToImageWriter/writeToFile
-;;    (let [mw  (new com.google.zxing.MultiFormatWriter)]
-;;      (.encode mw uri com.google.zxing.BarcodeFormat/QR_CODE size size ))
-;;    "png"
-;;    (new java.io.File  filename)))
 (defn curconv "convert between currencies"
   [amount from to ]
   (let [rates (get (get (client/get (format  "http://openexchangerates.org/api/latest.json?app_id=%s"
@@ -64,7 +55,6 @@
 
 (defn qr-encode-to-stream
   "qr encode and stuf"
-  ;;[uri filename & {:keys [size] :or {size 1000}}]
   [req]
   (let [size 500
         uri (coffee-bitcoin-uri-conf)
@@ -97,16 +87,6 @@
   )
 
 
-;; (defn qr-encode-btc
-;;   "qr encode btc"
-;;   [amount from message]
-;;   (qr-encode-to-file (format "bitcoin:%s?amount=%5f&label=mycoffeeshop&message=%s"
-;;                              (get-config :account)
-;;                              (curconv amount from :BTC )
-;;                              (clj-http.util/url-encode message))
-;;                      "/tmp/tst3.png"
-;;                      :size 500))
-
 (def walletnotify-transactions (ref {}))
 
 (def clients (atom {}))                 ; a hub, a map of client => sequence number
@@ -129,12 +109,11 @@
 
 
 (defn bitcoin [& rest]
-  (apply  (bitcoin-proxy "http://127.0.0.1:8332/" (get-config :bitcoind-user) (get-config :bitcoind-password) ) rest))
+  (apply  (bitcoin-proxy (get-config :bitcoind-url) (get-config :bitcoind-user) (get-config :bitcoind-password) ) rest))
 
 (defn walletnotify-callback
   "walletnotify-callback, when bitcoind receives a transaction for our wallet"
   [txid]
-  ;;(str "walletnotify " txid)
   (dosync
    ;;how many times have we seen this transaction?
    (alter walletnotify-transactions update-in [txid] #(if (number? %) (inc %) 1))
@@ -154,12 +133,11 @@
 
 (defn msg-handler [req]
   (with-channel req channel
-;;    (info channel "connected") ;;needs logging api
+    (info channel "connected") ;;needs logging api
     (swap! clients assoc channel true)
-;;    (on-receive channel #'mesg-received)
     (on-close channel (fn [status]
                         (swap! clients dissoc channel)
-                        ;;(info channel "closed, status" status)
+                        (info channel "closed, status" status)
                         ))))
 (defn btc-info
   [req]
@@ -190,6 +168,6 @@
   (let [handler (if true ;(in-dev? args)
                   (reload/wrap-reload (site #'app-routes)) ;; only reload when dev
                   (site app-routes))]
-    (run-server handler {:port 9198}))
+    (run-server handler {:port (get-config :port)}))
 
   )
