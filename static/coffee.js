@@ -1,8 +1,5 @@
 
-window.socket = new WebSocket(
-                              "ws://localhost:9198/ws"
-                              //window.location.href.replace("http://", "ws://")
-                              );
+window.socket = new WebSocket(window.location.href.replace("http://", "ws://").replace("qr-wrapper", "ws"));
 
 socket.onopen = function() {
     return console.log("socket opened");

@@ -146,7 +146,7 @@
 
 
 (defroutes app-routes
-  (GET "/ws" []  msg-handler)
+  (GET "/btc-coffee/ws" []  msg-handler)
   (GET "/btc-coffee/hello" [] "Hello, Coffee World yay yay!")
   (GET "/btc-coffee/info" [] btc-info)
   (GET "/btc-coffee/qr" [] qr-encode-to-stream)
