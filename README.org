@@ -10,12 +10,16 @@ Now you can scan the presented QR code, and messages show if the payment has bee
 
 
 ** building
+#+BEGIN_SRC 
 lein uberjar
+#+END_SRC
+
 
 ** running
+#+BEGIN_SRC 
 bitcoind -d
-java -jar target/btc-coffee-0.1.0-standalone.jar 
-
+java -jar target/btc-coffee-0.1.0-standalone.jar [--config-file /path/to/config/file]
+#+END_SRC
 
 
 ** License
