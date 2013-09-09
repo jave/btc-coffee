@@ -30,19 +30,21 @@
 ;;config
 
 
+(def config (atom {}))
 
 (defn load-config []
-  (def config  (read-string (slurp (str (System/getProperty "user.home") java.io.File/separator ".btc-coffee.clj"))))
+  (reset! config (read-string (slurp (str (System/getProperty "user.home") java.io.File/separator ".btc-coffee.clj"))))
   )
 ;;(load-config)
 
 (defn get-config [key]
-  (get config key))
+  (get @config key))
 
 (defn curconv "convert between currencies"
   [amount from to ]
-  (let [rates (get (get (client/get (format  "http://openexchangerates.org/api/latest.json?app_id=%s"
-                                             (get-config :ocx-key)) {:as :json}) :body) :rates)]
+  (let [rates
+        (get-in (client/get (format  "http://openexchangerates.org/api/latest.json?app_id=%s"
+                                     (get-config :ocx-key)) {:as :json}) [:body :rates])]
     (* (* amount  (get rates to)
           (/ 1  (get rates from))))))
 
@@ -52,6 +54,12 @@
                              (curconv (get-config :amount) (get-config :from) :BTC )
                              (get-config :label)                             
                              (clj-http.util/url-encode (get-config :message)  )))
+
+(defn coffee-bitcoin-msg []
+  (format "%d %s = %f :BTC"
+          (get-config :amount) (get-config :from)
+          (curconv (get-config :amount) (get-config :from) :BTC )
+          ))
 
 (defn qr-encode-to-stream
   "qr encode and stuf"
@@ -81,15 +89,15 @@
      (include-css "/chartroom.css")
      (include-js "/jquery-1.7.2.js")
      (include-js "/coffee.js")]
-    [:body [:h1#message "Scan!" ]
-     [:img {:src "/btc-coffee/qr"}
-      ]]))
+    [:body [:h1#message "Scan for Coffee!" ]
+     [:img {:src "/btc-coffee/qr"}]
+     [:h2 (coffee-bitcoin-msg)]]))
   )
 
 
 (def walletnotify-transactions (ref {}))
 
-(def clients (atom {}))                 ; a hub, a map of client => sequence number
+(def clients (atom {}))
 
 (defn send-message [message]
     (doseq [client (keys @clients)]
@@ -102,9 +110,9 @@
   "a payment has arrived"
   []
   ()
-  (send-message        (str "payment " (java.util.Date.)))
+  (send-message        (str "Payment received " (java.util.Date.)))
 
-  ( schedule-task 2000 (send-message "scan again"))
+  ( schedule-task 2000 (send-message "Scan for Coffee!"))
   )
 
 
