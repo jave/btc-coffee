@@ -10,6 +10,7 @@
                  [com.cemerick/pomegranate "0.2.0"]
                  [pawnshop "0.1.0-SNAPSHOT"]
                  [compojure "1.1.5"]
+                 [org.clojure/tools.cli "0.2.4"]
                  [ring/ring-devel "1.1.8"]
                  [ring/ring-core "1.1.8"]
                  [ring/ring-json "0.2.0"]

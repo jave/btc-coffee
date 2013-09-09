@@ -4,7 +4,8 @@
         (compojure [core :only [defroutes GET POST]]
                    [route :only [files]]
                    [handler :only [site]])
-        [clojure.tools.logging :only [info]]        
+        [clojure.tools.logging :only [info]]
+        [clojure.tools.cli :only [cli]]
         ring.middleware.json
         pawnshop.core
         org.httpkit.server
@@ -32,8 +33,8 @@
 
 (def config (atom {}))
 
-(defn load-config []
-  (reset! config (read-string (slurp (str (System/getProperty "user.home") java.io.File/separator ".btc-coffee.clj"))))
+(defn load-config [path]
+  (reset! config (read-string (slurp path)))
   )
 ;;(load-config)
 
@@ -170,12 +171,16 @@
 (defn -main
   "main."
   [& args]
-  (load-config)
+  (let [parsed-args (cli args
+                         ["-c" "--config-file" "path to configuration file"
+                          :default (str (System/getProperty "user.home") java.io.File/separator ".btc-coffee.clj")])]
 
-  (println "Hello, BTC Coffee World! ")
-  (let [handler (if true ;(in-dev? args)
-                  (reload/wrap-reload (site #'app-routes)) ;; only reload when dev
-                  (site app-routes))]
-    (run-server handler {:port (get-config :port)}))
+    (load-config (:config-file (first parsed-args)))
+
+    (println "Hello, BTC Coffee World! ")
+    (let [handler (if true ;(in-dev? args)
+                    (reload/wrap-reload (site #'app-routes)) ;; only reload when dev
+                    (site app-routes))]
+      (run-server handler {:port (get-config :port)})))
 
   )
