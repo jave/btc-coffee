@@ -91,7 +91,7 @@
      (include-js "/jquery-1.7.2.js")
      (include-js "/coffee.js")]
     [:body [:h1#message "Scan for Coffee!" ]
-     [:img {:src "/btc-coffee/qr"}]
+     [:a {:href (coffee-bitcoin-uri-conf)} [:img {:src "/btc-coffee/qr"}]]
      [:h2 (coffee-bitcoin-msg)]]))
   )
 
