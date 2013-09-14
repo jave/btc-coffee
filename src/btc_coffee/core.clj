@@ -92,6 +92,7 @@
      (include-js "/coffee.js")]
     [:body [:h1#message "Scan for Coffee!" ]
      [:a {:href (coffee-bitcoin-uri-conf)} [:img {:src "/btc-coffee/qr"}]]
+     [:a {:href (coffee-bitcoin-uri-conf)}  [:h3 (coffee-bitcoin-uri-conf)]]
      [:h2 (coffee-bitcoin-msg)]]))
   )
 
@@ -110,7 +111,6 @@
 (defn payment-received
   "a payment has arrived"
   []
-  ()
   (send-message        (str "Payment received " (java.util.Date.)))
 
   ( schedule-task 2000 (send-message "Scan for Coffee!"))
